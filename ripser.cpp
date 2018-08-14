@@ -40,7 +40,7 @@
 //#define ASSEMBLE_REDUCTION_MATRIX
 //#define USE_COEFFICIENTS
 
-//#define INDICATE_PROGRESS
+// #define INDICATE_PROGRESS
 #define PRINT_PERSISTENCE_PAIRS
 
 //#define USE_GOOGLE_HASHMAP
@@ -474,7 +474,7 @@ public:
 		          greater_diameter_or_smaller_index<diameter_index_t>());
 
 #ifdef PRINT_PERSISTENCE_PAIRS
-		std::cout << "persistence intervals in dim 0:" << std::endl;
+		// std::cout << "dim 0:" << std::endl;
 #endif
 
 		std::vector<index_t> vertices_of_edge(2);
@@ -486,7 +486,7 @@ public:
 			if (u != v) {
 #ifdef PRINT_PERSISTENCE_PAIRS
 				if (get_diameter(e) != 0)
-					std::cout << " [0," << get_diameter(e) << ")" << std::endl;
+					std::cout << "0, 0, " << get_diameter(e) << std::endl;
 #endif
 				dset.link(u, v);
 			} else
@@ -496,7 +496,7 @@ public:
 
 #ifdef PRINT_PERSISTENCE_PAIRS
 		for (index_t i = 0; i < n; ++i)
-			if (dset.find(i) == i) std::cout << " [0, )" << std::endl << std::flush;
+			if (dset.find(i) == i) std::cout << "0, 0, " << threshold << std::endl << std::flush;
 #endif
 	}
 
@@ -514,7 +514,7 @@ public:
 	                   hash_map<index_t, index_t>& pivot_column_index, index_t dim) {
 
 #ifdef PRINT_PERSISTENCE_PAIRS
-		std::cout << "persistence intervals in dim " << dim << ":" << std::endl;
+		// std::cout << "persistence intervals in dim " << dim << ":" << std::endl;
 #endif
 
 #ifdef ASSEMBLE_REDUCTION_MATRIX
@@ -544,7 +544,7 @@ public:
 			value_t diameter = get_diameter(column_to_reduce);
 
 #ifdef INDICATE_PROGRESS
-			if ((index_column_to_reduce + 1) % 1000000 == 0)
+			if ((index_column_to_reduce + 1) % 10 == 0)
 				std::cout << "\033[K"
 				          << "reducing column " << index_column_to_reduce + 1 << "/"
 				          << columns_to_reduce.size() << " (diameter " << diameter << ")"
@@ -610,9 +610,9 @@ public:
 						value_t death = get_diameter(pivot);
 						if (death > diameter * ratio) {
 #ifdef INDICATE_PROGRESS
-							std::cout << "\033[K";
+							// std::cout << "\033[K";
 #endif
-							std::cout << " [" << diameter << "," << death << ")" << std::endl
+							std::cout << dim << ", " << diameter << ", " << death << std::endl
 							          << std::flush;
 						}
 #endif
@@ -653,7 +653,7 @@ public:
 					}
 				} else {
 #ifdef PRINT_PERSISTENCE_PAIRS
-					std::cout << " [" << diameter << ", )" << std::endl << std::flush;
+					std::cout << dim << ", " << diameter << ", " << threshold << std::endl << std::flush;
 #endif
 					break;
 				}
@@ -984,13 +984,17 @@ compressed_lower_distance_matrix read_point_cloud(std::istream& input_stream) {
 	return compressed_lower_distance_matrix(std::move(distances));
 }
 
+// int num_deepak = 0;
 compressed_lower_distance_matrix read_lower_distance_matrix(std::istream& input_stream) {
 	std::vector<value_t> distances;
 	value_t value;
 	while (input_stream >> value) {
 		distances.push_back(value);
+		// num_deepak++;
 		input_stream.ignore();
 	}
+
+	// std::cout << distances.size() << " " << num_deepak << '\n';
 
 	return compressed_lower_distance_matrix(std::move(distances));
 }
@@ -1194,16 +1198,16 @@ int main(int argc, char** argv) {
 		if (d <= threshold) ++num_edges;
 	}
 
-	std::cout << "value range: [" << min << "," << max_finite << "]" << std::endl;
+	// std::cout << "value range: [" << min << "," << max_finite << "]" << std::endl;
 
 	if (threshold >= max) {
-		std::cout << "distance matrix with " << dist.size() << " points" << std::endl;
+		// std::cout << "distance matrix with " << dist.size() << " points" << std::endl;
 		ripser<compressed_lower_distance_matrix>(std::move(dist), dim_max, threshold, ratio,
 		                                         modulus)
 		    .compute_barcodes();
 	} else {
-		std::cout << "sparse distance matrix with " << dist.size() << " points and " << num_edges
-		          << "/" << (dist.size()*dist.size()-1)/2 << " entries" << std::endl;
+		// std::cout << "sparse distance matrix with " << dist.size() << " points and " << num_edges
+		          // << "/" << (dist.size()*dist.size()-1)/2 << " entries" << std::endl;
 
 		ripser<sparse_distance_matrix>(sparse_distance_matrix(std::move(dist), threshold), dim_max,
 		                               threshold, ratio, modulus)
